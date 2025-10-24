@@ -4,22 +4,20 @@ import sys
 import pickle
 import random
 import pymysql
-import gdown  # ✅ Google Drive 파일 다운로드용
-from flask import Flask, request, jsonify, render_template  # ✅ templates용
+import gdown
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from flask.json.provider import DefaultJSONProvider
 from openai import OpenAI
 from dotenv import load_dotenv
 from movie_api import get_movies_by_genre, get_movie_rating
 
-
 # ==========================
 # ✅ 기본 경로 설정
 # ==========================
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
-
 
 # ==========================
 # ✅ Google Drive 파일 ID 목록
@@ -31,9 +29,6 @@ drive_files = {
     "sub_vectorizers.pkl": "1U3H-LsFdL0ObM7urt1rJzY5CzGtIAqdT",
     "vectorizer.pkl": "1qgpEY14xJK8uoVzNQYLAmnbS4Oe2BbMg",
 }
-
-
-
 
 # ==========================
 # ✅ 모델 자동 다운로드 함수
@@ -48,31 +43,23 @@ def ensure_models_downloaded():
         else:
             print(f"✅ {filename} 이미 존재")
 
-
 # ==========================
 # ✅ 환경 변수 로드 (.env)
 # ==========================
-from dotenv import load_dotenv
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # ✅ 절대경로 보장
 env_path = os.path.join(BASE_DIR, ".env")
-
 if os.path.exists(env_path):
     load_dotenv(dotenv_path=env_path)
     print(f"📂 .env 로드 완료: {env_path}")
 else:
-    print(f"⚠️ .env 파일을 찾을 수 없습니다: {env_path}")
+    print(f"⚠️ .env 파일 없음 — Railway 환경 변수 사용 예정")
 
 api_key = os.getenv("OPENAI_API_KEY")
-
 if not api_key:
-    raise ValueError("❌ OpenAI API Key가 설정되지 않았습니다. .env 또는 환경변수를 확인하세요.")
+    raise ValueError("❌ OpenAI API Key가 설정되지 않았습니다.")
 else:
     print(f"🔑 OpenAI Key 불러옴: {api_key[:10]}...")
 
 client = OpenAI(api_key=api_key)
-
 
 # ==========================
 # ✅ Flask 설정
@@ -81,36 +68,29 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 app.config["JSON_AS_ASCII"] = False
 
-
 class UTF8JSONProvider(DefaultJSONProvider):
     def dumps(self, obj, **kwargs):
         kwargs.setdefault("ensure_ascii", False)
         return json.dumps(obj, **kwargs)
-
     def loads(self, s, **kwargs):
         return json.loads(s, **kwargs)
 
-
 app.json = UTF8JSONProvider(app)
 sys.stdout.reconfigure(encoding="utf-8")
-
 
 # ==========================
 # ✅ 모델 로드
 # ==========================
 try:
-    ensure_models_downloaded()  # ✅ Google Drive에서 자동 다운로드
-
+    ensure_models_downloaded()
     model = pickle.load(open(os.path.join(MODEL_DIR, "emotion_model.pkl"), "rb"))
     sub_model = pickle.load(open(os.path.join(MODEL_DIR, "emotion_sub_model.pkl"), "rb"))
     vectorizer = pickle.load(open(os.path.join(MODEL_DIR, "vectorizer.pkl"), "rb"))
     sub_vectorizer = pickle.load(open(os.path.join(MODEL_DIR, "sub_vectorizers.pkl"), "rb"))
-
     print("✅ 감정 분석 모델 및 세부감정 모델 로드 완료")
 except Exception as e:
     print(f"❌ 모델 로드 중 오류 발생: {e}")
     exit()
-
 
 # ==========================
 # ✅ 감정 → 장르 매핑
@@ -125,11 +105,8 @@ emotion_to_genre = {
     "탐구": [99, 36, 18, 37],
 }
 
-
 def get_genre_by_emotion(emotion):
-    genres = emotion_to_genre.get(emotion, [18])
-    return random.choice(genres)
-
+    return random.choice(emotion_to_genre.get(emotion, [18]))
 
 # ==========================
 # ✅ /emotion 엔드포인트
@@ -139,7 +116,6 @@ def emotion_endpoint():
     try:
         data = request.get_json()
         user_input = data.get("emotion", "").strip()
-
         if not user_input:
             return jsonify({"reply": "감정을 입력해 주세요"}), 400
 
@@ -160,18 +136,14 @@ def emotion_endpoint():
             "sub_emotion": predicted_sub,
             "movies": movies
         })
-
     except Exception as e:
         print("❌ /emotion 오류:", e)
         return jsonify({"reply": "서버에서 오류가 발생했어요"}), 500
 
-
 # ==========================
-# ✅ /chat 엔드포인트 (3턴 대화)
+# ✅ /chat 엔드포인트
 # ==========================
 conversation_history = []
-recommended_movies_memory = []
-
 
 @app.route("/chat", methods=["POST"])
 def chat_turn():
@@ -181,16 +153,13 @@ def chat_turn():
         turn = data.get("turn", 1)
         gpt_reply = ""
 
-        # 🔹 turn 판별
         if isinstance(turn, str):
             turn_type = "after_recommend" if turn == "after_recommend" else "normal"
         else:
             turn_type = "normal"
 
-        global conversation_history
         conversation_history.append({"role": "user", "content": user_msg})
 
-        # ✅ 1~2턴 대화
         if turn_type == "normal" and turn < 3:
             system_prompt = (
                 "너는 감정상담 친구야. "
@@ -208,13 +177,12 @@ def chat_turn():
             conversation_history.append({"role": "assistant", "content": gpt_reply})
             return jsonify({"reply": gpt_reply, "final": False})
 
-        # ✅ 추천 이후 대화
         elif turn_type == "after_recommend":
             followup_prompt = (
                 "너는 감정 기반 영화 추천 친구야. "
-                "지금까지의 대화와 추천한 영화들을 기억해. "
-                "사용자가 영화 제목 일부나 '첫번째꺼', '이거', '그거' 같은 표현을 해도 이해해야 해. "
-                "평점, 배우, 분위기를 물으면 자연스럽게 설명해줘. "
+                "이전 대화와 추천 영화를 기억하고, "
+                "사용자가 '첫번째꺼', '이거' 같은 표현을 해도 이해해야 해. "
+                "평점, 배우, 분위기를 물으면 자연스럽게 설명해줘."
             )
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -227,12 +195,11 @@ def chat_turn():
             gpt_reply = response.choices[0].message.content.strip()
             return jsonify({"reply": gpt_reply})
 
-        # ✅ 3턴 이후 (요약 + 감정분석 + 추천)
+        # 3턴 이후 감정 분석 및 추천
         summary_prompt = f"""
         다음은 사용자와 감정상담 챗봇의 3턴 대화야:
         {conversation_history}
         사용자의 감정 상태를 한 문장으로 요약해줘.
-        예: '요즘 마음이 공허한가 봐.', '피곤해서 기운이 없는 상태야.'
         """
         summary_response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -246,7 +213,6 @@ def chat_turn():
 
         X = vectorizer.transform([summary_text])
         predicted_emotion = model.predict(X)[0]
-
         try:
             X_sub = sub_vectorizer.transform([summary_text])
             predicted_sub = sub_model.predict(X_sub)[0]
@@ -269,17 +235,19 @@ def chat_turn():
         print("❌ /chat 오류:", e)
         return jsonify({"reply": "서버 오류 발생"}), 500
 
-
 # ==========================
-# ✅ HTML 템플릿 연결 (templates/index.html)
+# ✅ HTML 라우트
 # ==========================
 @app.route("/")
 def home():
     return render_template("index.html")
 
+@app.route("/chatbot")
+def chatbot_page():
+    return render_template("chatbot.html")
 
 # ==========================
-# ✅ DB 연결 및 통계 API (Railway MySQL)
+# ✅ DB 연결 및 통계 API
 # ==========================
 def get_connection():
     return pymysql.connect(
@@ -291,7 +259,6 @@ def get_connection():
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor,
     )
-
 
 @app.route("/stats")
 def get_stats():
@@ -307,7 +274,6 @@ def get_stats():
     conn.close()
     return jsonify(result)
 
-
 @app.route("/top10")
 def get_top10_movies():
     conn = get_connection()
@@ -322,7 +288,6 @@ def get_top10_movies():
     result = cursor.fetchall()
     conn.close()
     return jsonify(result)
-
 
 # ==========================
 # ✅ 서버 실행

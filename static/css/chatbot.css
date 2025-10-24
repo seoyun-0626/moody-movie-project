@@ -1,0 +1,267 @@
+:root{
+  --bg:#241f1f;
+  --panel:#2d2727;
+  --accent:#ff5a2f;
+  --text:#f5f5f5;
+  --muted:#bdbdbd;
+  --card:#322b2b;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+
+/* ===== 기본 구조 ===== */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'HakgyoansimWooju', sans-serif;
+  overflow-x: hidden;
+}
+
+.cb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(180deg,#1f1a1a,#251f1f);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+.logo-wrap { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+}
+.logo-icon { 
+  width: 80px;
+  height: 80px; 
+  filter: drop-shadow(0 0 10px rgba(255,90,47,.4)); 
+}
+
+.brand { 
+  margin: 0; 
+  font-size: 20px; 
+}
+
+.back-btn {
+  width: 30px;
+  height: 30px;
+  fill: white;
+  padding: 8px;
+  background: var(--accent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-btn:hover {
+  background: #ff714d; /* var(--accent)보다 약간 밝은 색 */
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 90, 47, 0.5);
+}
+
+
+/* === 메인 영역 === */
+.cb-main{
+  max-width:980px;
+  margin:20px auto;
+  display:flex;
+  flex-direction:column;
+  height:calc(100vh - 90px);
+  padding:0 12px;
+}
+
+/* === 채팅창 === */
+.chat-box{
+  flex:1;
+  overflow:auto;
+  background:var(--panel);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+
+/* === 메시지 구조 === */
+.row{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+  margin:16px 0;
+}
+.msg{
+  max-width:75%;
+  padding:12px 14px;
+  border-radius:16px;
+  line-height:1.45;
+}
+.bot{background:var(--card);}
+.user{background:#3b3232;margin-left:auto;}
+.thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 90, 47, 0.2);
+
+  /* 중앙 정렬 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 아이콘이 너무 붙지 않게 약간 여백 */
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;         /* 부모 크기의 70% 정도 */
+  height: 100%;
+  object-fit: contain; /* 이미지 비율 유지하면서 꽉 채움 */
+  display: block;      /* inline 이미지 하단 여백 제거 */
+}
+
+
+/* === 입력창 === */
+.input-area{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.input-area input{
+  flex:1;
+  background:var(--panel);
+  border:none;
+  outline:none;
+  color:var(--text);
+  padding:12px 14px;
+  border-radius:12px;
+  box-shadow:var(--shadow);
+}
+.input-area button{
+  border:none;
+  background:var(--accent);
+  color:#1a1a1a;
+  padding:12px 16px;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.input-area button:hover{opacity:.9;}
+
+
+/* === 스크롤바 디자인 === */
+.chat-box::-webkit-scrollbar {
+  width: 10px;              /* 스크롤바 두께 */
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: var(--panel);  /* 트랙(바탕)은 패널색 */
+  border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background-color: var(--accent); /* 스크롤 막대는 주황 포인트색 */
+  border-radius: 10px;
+  border: 2px solid var(--panel);  /* 주변 여백 효과 */
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background-color: #ff764f; /* 호버 시 더 밝은 오렌지 */
+}
+
+/* 파이어폭스 호환용 */
+.chat-box {
+  scrollbar-width: thin; /* 얇은 스크롤바 */
+  scrollbar-color: var(--accent) var(--panel);
+}
+
+
+/* === TMDB 포스터 섹션 === */
+.poster-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+.poster-wrap img {
+  width: 110px;
+  height: 160px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.poster-wrap img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(255,90,47,0.4);
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .poster-wrap img {
+    width: 90px;
+    height: 130px;
+  }
+}
+
+/*로고 애니메이션*/
+.tracking-in-expand {
+  animation: tracking-in-expand 1.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) infinite alternate;
+}
+
+/* ----------------------------------------
+ * tracking-in-expand (텍스트 자간 확장 + 페이드인)
+ * ---------------------------------------- */
+@keyframes tracking-in-expand {
+  0% {
+    letter-spacing: -0.5em;
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    letter-spacing: normal;
+    opacity: 1;
+  }
+}
+
+
+
+
+
+/* =============================
+🎡 스피너 로딩 애니메이션
+============================= */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 12px;
+  align-self: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 스피너 행 */
+.loading-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
