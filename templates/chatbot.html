@@ -1,40 +1,47 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>무디무비 챗봇</title>
 
-  <!-- ✅ 정적 파일은 루트 기준 절대경로로 지정 -->
-  <link rel="stylesheet" href="/static/css/chatbot.css">
-  <link rel="icon" type="image/png" href="/static/assets/img/chatbot-logo.png">
+  <!-- ✅ CSS 절대 경로 -->
+  <link rel="stylesheet" href="/static/css/chatbot.css" />
+
+  <!-- ✅ 파비콘 절대 경로 -->
+  <link rel="icon" type="image/png" href="/static/assets/img/chatbot-logo.png" />
 </head>
 
 <body>
   <header class="cb-header">
     <div class="logo-wrap">
+      <!-- ✅ 로고 이미지 절대 경로 -->
       <img src="/static/assets/img/chatbot-logo.png" class="logo-icon" alt="logo" />
       <h1 class="brand tracking-in-expand">MoodyMovie</h1>
     </div>
 
-    <!-- ✅ Flask 템플릿 간 이동 -->
+    <!-- ✅ 홈으로 돌아가기 링크 -->
     <a href="/index.html" class="back-btn">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-        <path d="M341.8 72.6C329.5 61.2 310.5 61.2 298.3 72.6L74.3 280.6C64.7 289.6 61.5 303.5 66.3 315.7C71.1 327.9 82.8 336 96 336L112 336L112 512C112 547.3 140.7 576 176 576L464 576C499.3 576 528 547.3 528 512L528 336L544 336C557.2 336 569 327.9 573.8 315.7C578.6 303.5 575.4 289.5 565.8 280.6L341.8 72.6zM304 384L336 384C362.5 384 384 405.5 384 432L384 528L256 528L256 432C256 405.5 277.5 384 304 384z"/>
+        <path d="M341.8 72.6C329.5 61.2 310.5 61.2 298.3 72.6L74.3 280.6C64.7 289.6 61.5 303.5 66.3 315.7C71.1 327.9 82.8 336 96 336L112 336L112 512C112 547.3 140.7 576 176 576L464 576C499.3 576 528 547.3 528 512L528 336L544 336C557.2 336 569 327.9 573.8 315.7C578.6 303.5 575.4 289.5 565.8 280.6L341.8 72.6zM304 384L336 384C362.5 384 384 405.5 384 432L384 528L256 528L256 432C256 405.5 277.5 384 304 384z" />
       </svg>
     </a>
   </header>
-    
+
   <main class="cb-main">
     <div id="chat" class="chat-box"></div>
 
     <div class="input-area">
-      <input id="user-input" type="text" placeholder="오늘 기분을 한 문장으로 말해보세요. 예) '좀 외롭고 피곤해요'"/>
+      <input
+        id="user-input"
+        type="text"
+        placeholder="오늘 기분을 한 문장으로 말해보세요. 예) '좀 외롭고 피곤해요'"
+      />
       <button id="send-btn">전송</button>
     </div>
   </main>
 
-  <!-- ✅ JS 파일도 절대경로로 -->
+  <!-- ✅ JS 절대 경로 -->
   <script src="/static/js/chatbot.js" defer></script>
 </body>
 </html>

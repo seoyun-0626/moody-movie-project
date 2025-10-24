@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MoodyMovie - 메인</title>
 
-  <!-- ✅ 절대경로 수정 -->
-  <link rel="stylesheet" href="/static/css/index.css"/>
+  <!-- ✅ CSS 절대 경로 -->
+  <link rel="stylesheet" href="/static/css/index.css" />
 </head>
+
 <body>
   <header class="mm-header">
     <div class="logo-wrap">
+      <!-- ✅ 로고 절대 경로 -->
       <img src="/static/assets/img/chatbot-logo.png" alt="MoodyMovie" class="logo-icon"/>
       <h2 class="brand tracking-in-expand">MoodyMovie</h2>
     </div>
@@ -22,7 +24,7 @@
     </div>
 
     <div class="chat-wrapper home-chat-inline">
-      <!-- ✅ 챗봇 페이지 링크 -->
+      <!-- ✅ 챗봇 버튼 절대 경로 -->
       <a class="chatbtn icon" href="/chatbot">
         <img id="emotion-icon" src="/static/assets/img/chatbot-logo.png" alt="챗봇 아이콘" />
       </a>
@@ -64,7 +66,7 @@
         </section>
 
         <!-- Top10 슬라이더 -->
-        <h3 class="section-title">챗봇이 많이 추천한 영화 Top 10 </h3>
+        <h3 class="section-title">챗봇이 많이 추천한 영화 Top 10</h3>
         <section class="slider" id="top10-slider">
           <div class="slider-track" id="top10-track"></div>
           <div class="movie-detail hidden" id="top10-detail"></div>
@@ -105,7 +107,7 @@
     </section>
   </main>
 
-  <!-- ✅ 절대경로 JS -->
+  <!-- ✅ JS 절대 경로 -->
   <script src="/static/js/index.js" defer></script>
 </body>
 </html>

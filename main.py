@@ -12,6 +12,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from movie_api import get_movies_by_genre, get_movie_rating
 
+
 # ==========================
 # ✅ 기본 경로 설정
 # ==========================
@@ -19,8 +20,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
+
 # ==========================
-# ✅ Google Drive 파일 ID 목록
+# ✅ Google Drive 모델 파일 ID 목록
 # ==========================
 drive_files = {
     "emotion_model.pkl": "13tBT7LQe9LpJm2xXz9Bm-oNlOdjjYZV1",
@@ -30,8 +32,9 @@ drive_files = {
     "vectorizer.pkl": "1qgpEY14xJK8uoVzNQYLAmnbS4Oe2BbMg",
 }
 
+
 # ==========================
-# ✅ 모델 자동 다운로드 함수
+# ✅ 모델 자동 다운로드
 # ==========================
 def ensure_models_downloaded():
     for filename, file_id in drive_files.items():
@@ -43,8 +46,9 @@ def ensure_models_downloaded():
         else:
             print(f"✅ {filename} 이미 존재")
 
+
 # ==========================
-# ✅ 환경 변수 로드 (.env)
+# ✅ 환경 변수 로드
 # ==========================
 env_path = os.path.join(BASE_DIR, ".env")
 if os.path.exists(env_path):
@@ -61,6 +65,7 @@ else:
 
 client = OpenAI(api_key=api_key)
 
+
 # ==========================
 # ✅ Flask 설정
 # ==========================
@@ -68,15 +73,20 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/*": {"origins": "*"}})
 app.config["JSON_AS_ASCII"] = False
 
+
+# ✅ JSON 한글 깨짐 방지
 class UTF8JSONProvider(DefaultJSONProvider):
     def dumps(self, obj, **kwargs):
         kwargs.setdefault("ensure_ascii", False)
         return json.dumps(obj, **kwargs)
+
     def loads(self, s, **kwargs):
         return json.loads(s, **kwargs)
 
+
 app.json = UTF8JSONProvider(app)
 sys.stdout.reconfigure(encoding="utf-8")
+
 
 # ==========================
 # ✅ 모델 로드
@@ -92,6 +102,7 @@ except Exception as e:
     print(f"❌ 모델 로드 중 오류 발생: {e}")
     exit()
 
+
 # ==========================
 # ✅ 감정 → 장르 매핑
 # ==========================
@@ -105,8 +116,10 @@ emotion_to_genre = {
     "탐구": [99, 36, 18, 37],
 }
 
+
 def get_genre_by_emotion(emotion):
     return random.choice(emotion_to_genre.get(emotion, [18]))
+
 
 # ==========================
 # ✅ /emotion 엔드포인트
@@ -140,10 +153,12 @@ def emotion_endpoint():
         print("❌ /emotion 오류:", e)
         return jsonify({"reply": "서버에서 오류가 발생했어요"}), 500
 
+
 # ==========================
 # ✅ /chat 엔드포인트
 # ==========================
 conversation_history = []
+
 
 @app.route("/chat", methods=["POST"])
 def chat_turn():
@@ -153,6 +168,7 @@ def chat_turn():
         turn = data.get("turn", 1)
         gpt_reply = ""
 
+        # 🔹 turn 유형 구분
         if isinstance(turn, str):
             turn_type = "after_recommend" if turn == "after_recommend" else "normal"
         else:
@@ -160,42 +176,52 @@ def chat_turn():
 
         conversation_history.append({"role": "user", "content": user_msg})
 
+        # 🔹 1~2턴: 감정 대화
         if turn_type == "normal" and turn < 3:
-            system_prompt = (
-                "너는 감정상담 친구야. "
-                "사용자의 말을 따뜻하게 공감하면서 짧게 답하고, "
-                "반드시 마지막에 질문을 하나 덧붙여."
-            )
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_msg},
-                ],
-            )
-            gpt_reply = response.choices[0].message.content.strip()
-            conversation_history.append({"role": "assistant", "content": gpt_reply})
-            return jsonify({"reply": gpt_reply, "final": False})
+            try:
+                system_prompt = (
+                    "너는 감정상담 친구야. "
+                    "사용자의 말을 따뜻하게 공감하면서 짧게 답하고, "
+                    "반드시 마지막에 질문을 하나 덧붙여."
+                )
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_msg},
+                    ],
+                )
+                gpt_reply = response.choices[0].message.content.strip()
+                conversation_history.append({"role": "assistant", "content": gpt_reply})
+                return jsonify({"reply": gpt_reply, "final": False})
+            except Exception as e:
+                print("⚠️ GPT 응답 오류:", e)
+                return jsonify({"reply": "지금은 잠시 대화가 어렵습니다 😢"}), 500
 
+        # 🔹 영화 추천 후 대화
         elif turn_type == "after_recommend":
-            followup_prompt = (
-                "너는 감정 기반 영화 추천 친구야. "
-                "이전 대화와 추천 영화를 기억하고, "
-                "사용자가 '첫번째꺼', '이거' 같은 표현을 해도 이해해야 해. "
-                "평점, 배우, 분위기를 물으면 자연스럽게 설명해줘."
-            )
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": followup_prompt},
-                    *conversation_history,
-                    {"role": "user", "content": user_msg},
-                ],
-            )
-            gpt_reply = response.choices[0].message.content.strip()
-            return jsonify({"reply": gpt_reply})
+            try:
+                followup_prompt = (
+                    "너는 감정 기반 영화 추천 친구야. "
+                    "이전 대화와 추천 영화를 기억하고, "
+                    "사용자가 '첫번째꺼', '이거' 같은 표현을 해도 이해해야 해. "
+                    "평점, 배우, 분위기를 물으면 자연스럽게 설명해줘."
+                )
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": followup_prompt},
+                        *conversation_history,
+                        {"role": "user", "content": user_msg},
+                    ],
+                )
+                gpt_reply = response.choices[0].message.content.strip()
+                return jsonify({"reply": gpt_reply})
+            except Exception as e:
+                print("⚠️ GPT after_recommend 오류:", e)
+                return jsonify({"reply": "서버 응답 오류입니다 😢"}), 500
 
-        # ✅ 3턴 이후 요약 + 추천
+        # 🔹 3턴 이후: 감정 요약 + 추천
         summary_prompt = f"""
         다음은 사용자와 감정상담 챗봇의 3턴 대화야:
         {conversation_history}
@@ -235,6 +261,7 @@ def chat_turn():
         print("❌ /chat 오류:", e)
         return jsonify({"reply": "서버 오류 발생"}), 500
 
+
 # ==========================
 # ✅ HTML 라우트
 # ==========================
@@ -250,6 +277,7 @@ def index_alias():
 def chatbot_page():
     return render_template("chatbot.html")
 
+
 # ==========================
 # ✅ DB 연결 및 통계 API
 # ==========================
@@ -264,34 +292,45 @@ def get_connection():
         cursorclass=pymysql.cursors.DictCursor,
     )
 
+
 @app.route("/stats")
 def get_stats():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT rep_emotion, COUNT(*) AS count
-        FROM movies_emotions
-        GROUP BY rep_emotion
-        ORDER BY count DESC;
-    """)
-    result = cursor.fetchall()
-    conn.close()
-    return jsonify(result)
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT rep_emotion, COUNT(*) AS count
+            FROM movies_emotions
+            GROUP BY rep_emotion
+            ORDER BY count DESC;
+        """)
+        result = cursor.fetchall()
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        print("⚠️ /stats 오류:", e)
+        return jsonify([])
+
 
 @app.route("/top10")
 def get_top10_movies():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT movie, COUNT(*) AS count
-        FROM movies_emotions
-        GROUP BY movie
-        ORDER BY count DESC
-        LIMIT 10;
-    """)
-    result = cursor.fetchall()
-    conn.close()
-    return jsonify(result)
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT movie, COUNT(*) AS count
+            FROM movies_emotions
+            GROUP BY movie
+            ORDER BY count DESC
+            LIMIT 10;
+        """)
+        result = cursor.fetchall()
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        print("⚠️ /top10 오류:", e)
+        return jsonify([])
+
 
 # ==========================
 # ✅ 서버 실행

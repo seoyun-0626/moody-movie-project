@@ -1,6 +1,8 @@
+// 🎬 TMDB API 설정
 const apiKey = "8cde0962eca9041f7345e9c7ab7a4b7f";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
+// 🎞️ 요소 선택
 const moviesDiv = document.getElementById("movies");
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("search-btn");
@@ -12,6 +14,7 @@ async function getPopularMovies() {
       `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`
     );
     if (!res.ok) throw new Error("TMDB API 요청 실패");
+
     const data = await res.json();
     displayMovies(data.results);
   } catch (err) {
@@ -30,6 +33,7 @@ async function searchMovies(query) {
       )}&page=1`
     );
     if (!res.ok) throw new Error("검색 요청 실패");
+
     const data = await res.json();
     displayMovies(data.results);
   } catch (err) {
@@ -49,8 +53,14 @@ function displayMovies(movies) {
   movies.forEach((movie) => {
     const card = document.createElement("div");
     card.classList.add("movie-card");
+
+    // ✅ 포스터 없을 경우 기본 이미지 대체
+    const posterUrl = movie.poster_path
+      ? IMAGE_BASE + movie.poster_path
+      : "/static/assets/img/no-poster.png"; // ← 절대경로로 수정
+
     card.innerHTML = `
-      <img src="${movie.poster_path ? IMAGE_BASE + movie.poster_path : "/static/assets/img/no-poster.png"}" alt="${movie.title}">
+      <img src="${posterUrl}" alt="${movie.title}">
       <h3>${movie.title}</h3>
       <p>⭐ 평점: ${movie.vote_average?.toFixed?.(1) ?? "0.0"}</p>
       <p>📅 개봉일: ${movie.release_date || "정보 없음"}</p>
