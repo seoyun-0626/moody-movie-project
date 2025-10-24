@@ -1,47 +1,111 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>무디무비 챗봇</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MoodyMovie - 메인</title>
 
-  <!-- ✅ templates → static/css -->
-  <link rel="stylesheet" href="../static/css/chatbot.css">
-
-  <!-- ✅ templates → static/assets/img -->
-  <link rel="icon" type="image/png" href="../static/assets/img/chatbot-logo.png">
+  <!-- ✅ 절대경로 수정 -->
+  <link rel="stylesheet" href="/static/css/index.css"/>
 </head>
-
 <body>
-  <header class="cb-header">
+  <header class="mm-header">
     <div class="logo-wrap">
-      <!-- ✅ templates → static/assets/img -->
-      <img src="../static/assets/img/chatbot-logo.png" class="logo-icon" alt="logo" />
-      <h1 class="brand tracking-in-expand">MoodyMovie</h1>
+      <img src="/static/assets/img/chatbot-logo.png" alt="MoodyMovie" class="logo-icon"/>
+      <h2 class="brand tracking-in-expand">MoodyMovie</h2>
     </div>
-
-    <!-- ✅ templates → templates (같은 폴더) -->
-    <a href="index.html" class="back-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-        <path d="M341.8 72.6C329.5 61.2 310.5 61.2 298.3 72.6L74.3 280.6C64.7 289.6 61.5 303.5 66.3 315.7C71.1 327.9 82.8 336 96 336L112 336L112 512C112 547.3 140.7 576 176 576L464 576C499.3 576 528 547.3 528 512L528 336L544 336C557.2 336 569 327.9 573.8 315.7C578.6 303.5 575.4 289.5 565.8 280.6L341.8 72.6zM304 384L336 384C362.5 384 384 405.5 384 432L384 528L256 528L256 432C256 405.5 277.5 384 304 384z"/>
-      </svg>
-    </a>
   </header>
 
-  <main class="cb-main">
-    <div id="chat" class="chat-box"></div>
-
-    <div class="input-area">
-      <input
-        id="user-input"
-        type="text"
-        placeholder="오늘 기분을 한 문장으로 말해보세요. 예) '좀 외롭고 피곤해요'"
-      />
-      <button id="send-btn">전송</button>
+  <section id="emotion-summary" class="emotion-summary">
+    <div class="emotion-text">    
+      <p id="top-emotion">데이터를 불러오는 중이에요 🕐</p>
     </div>
+
+    <div class="chat-wrapper home-chat-inline">
+      <!-- ✅ 챗봇 페이지 링크 -->
+      <a class="chatbtn icon" href="/chatbot">
+        <img id="emotion-icon" src="/static/assets/img/chatbot-logo.png" alt="챗봇 아이콘" />
+      </a>
+      <a>챗봇</a>
+      <div class="chat-tooltip">감정에 맞는 영화를 추천해 드릴게요!</div>
+    </div>
+  </section>
+
+  <main class="mm-main">
+    <!-- ✅ 홈 뷰 -->
+    <section id="home-view">
+      <section class="search-section">
+        <div class="search-bar">
+          <div class="search-container">
+            <input id="search-input" type="text" placeholder="영화 제목을 검색하세요" />
+            <ul id="search-history" class="hidden"></ul>
+          </div>
+          <button id="search-btn" class="search-btn" type="button">
+            <img src="/static/assets/img/search-icon.png" alt="검색" />
+          </button>
+        </div>   
+      </section>
+
+      <div class="main-container">
+        <section class="genre-selector">
+          <button class="genre-btn active" data-id="35">코미디</button>
+          <button class="genre-btn" data-id="16,10402">애니메이션 / 음악</button>
+          <button class="genre-btn" data-id="80,27,53,9648">범죄 / 스릴러 / 미스터리 / 공포</button>
+          <button class="genre-btn" data-id="10749,10751,18">로맨스 / 가족 / 드라마</button>
+          <button class="genre-btn" data-id="28,12">액션 / 모험</button>
+          <button class="genre-btn" data-id="14,878">판타지 / SF</button>
+          <button class="genre-btn" data-id="99,36">다큐 / 역사</button>
+        </section>
+
+        <!-- 메인 슬라이더 -->
+        <section class="slider" id="slider">
+          <div class="slider-track" id="slider-track"></div>
+          <div class="movie-detail" id="movie-detail"></div>
+        </section>
+
+        <!-- Top10 슬라이더 -->
+        <h3 class="section-title">챗봇이 많이 추천한 영화 Top 10 </h3>
+        <section class="slider" id="top10-slider">
+          <div class="slider-track" id="top10-track"></div>
+          <div class="movie-detail hidden" id="top10-detail"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ✅ 검색 결과 뷰 -->
+    <section id="results-view" class="hidden">
+      <section class="search-section">
+        <div class="search-bar">
+          <div class="search-container">
+            <input id="search-input-results" type="text" placeholder="영화 제목을 검색하세요" />
+            <ul id="search-history-results" class="hidden"></ul>
+          </div>
+          <button id="search-btn-results" class="search-btn" type="button">
+            <img src="/static/assets/img/search-icon.png" alt="검색" />
+          </button>
+        </div>
+      </section>
+
+      <div class="main-container">
+        <h2 class="results-title">검색 결과</h2>
+        <div class="grid-section">
+          <div id="movies" class="grid"></div>
+        </div>
+        <div class="movie-detail hidden" id="movie-detail-results"></div>
+      </div>
+      
+      <div class="chat-wrapper grid-chat">
+        <a id="grid-chatbtn" class="chatbtn-grid icon" href="/chatbot">
+          <img id="grid-emotion-icon" src="/static/assets/img/grid-chatbot.png" alt="챗봇 아이콘" />
+        </a>
+        <div class="chat-tooltip">영화를 추천해 드릴까요?</div>
+      </div>
+
+      <button id="scrollTopBtn" title="맨 위로">↑</button>
+    </section>
   </main>
 
-  <!-- ✅ templates → static/js -->
-  <script src="../static/js/chatbot.js" defer></script>
+  <!-- ✅ 절대경로 JS -->
+  <script src="/static/js/index.js" defer></script>
 </body>
 </html>

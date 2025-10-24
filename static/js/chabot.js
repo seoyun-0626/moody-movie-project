@@ -23,7 +23,7 @@ function appendMsg(text, who = "bot") {
   if (who === "bot") {
     const thumb = document.createElement("div");
     thumb.className = "thumb";
-    thumb.innerHTML = `<img src="../static/assets/img/chatbot-logo.png" alt="bot">`;
+    thumb.innerHTML = `<img src="/static/assets/img/chatbot-logo.png" alt="bot">`;
     row.appendChild(thumb);
   }
 
@@ -39,7 +39,7 @@ function showSpinner() {
 
   const thumb = document.createElement("div");
   thumb.className = "thumb";
-  thumb.innerHTML = `<img src="../static/assets/img/chatbot-logo.png" alt="bot">`;
+  thumb.innerHTML = `<img src="/static/assets/img/chatbot-logo.png" alt="bot">`;
 
   const spinner = document.createElement("div");
   spinner.className = "spinner";
@@ -74,7 +74,7 @@ async function displayMoviePosters(movieList) {
 
   const thumb = document.createElement("div");
   thumb.className = "thumb";
-  thumb.innerHTML = `<img src="../static/assets/img/chatbot-logo.png" alt="bot">`;
+  thumb.innerHTML = `<img src="/static/assets/img/chatbot-logo.png" alt="bot">`;
   row.appendChild(thumb);
 
   const posterWrap = document.createElement("div");
