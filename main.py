@@ -64,7 +64,7 @@ client = OpenAI(api_key=api_key)
 # ==========================
 # ✅ Flask 설정
 # ==========================
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/*": {"origins": "*"}})
 app.config["JSON_AS_ASCII"] = False
 
@@ -195,7 +195,7 @@ def chat_turn():
             gpt_reply = response.choices[0].message.content.strip()
             return jsonify({"reply": gpt_reply})
 
-        # 3턴 이후 감정 분석 및 추천
+        # ✅ 3턴 이후 요약 + 추천
         summary_prompt = f"""
         다음은 사용자와 감정상담 챗봇의 3턴 대화야:
         {conversation_history}
@@ -240,6 +240,10 @@ def chat_turn():
 # ==========================
 @app.route("/")
 def home():
+    return render_template("index.html")
+
+@app.route("/index.html")
+def index_alias():
     return render_template("index.html")
 
 @app.route("/chatbot")
