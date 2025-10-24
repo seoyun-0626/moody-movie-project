@@ -52,10 +52,24 @@ def ensure_models_downloaded():
 # ==========================
 # ✅ 환경 변수 로드 (.env)
 # ==========================
-load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
+from dotenv import load_dotenv
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # ✅ 절대경로 보장
+env_path = os.path.join(BASE_DIR, ".env")
+
+if os.path.exists(env_path):
+    load_dotenv(dotenv_path=env_path)
+    print(f"📂 .env 로드 완료: {env_path}")
+else:
+    print(f"⚠️ .env 파일을 찾을 수 없습니다: {env_path}")
 
 api_key = os.getenv("OPENAI_API_KEY")
-print(f"🔑 OpenAI Key 불러옴: {api_key[:10]}..." if api_key else "❌ OpenAI Key 없음")
+
+if not api_key:
+    raise ValueError("❌ OpenAI API Key가 설정되지 않았습니다. .env 또는 환경변수를 확인하세요.")
+else:
+    print(f"🔑 OpenAI Key 불러옴: {api_key[:10]}...")
 
 client = OpenAI(api_key=api_key)
 
