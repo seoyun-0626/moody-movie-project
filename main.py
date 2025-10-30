@@ -382,17 +382,18 @@ def chatbot():
 # ============================================================
 def get_connection():
     return pymysql.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        db=os.getenv("DB_NAME"),
-        port=int(os.getenv("DB_PORT", 3306)),
+        host=os.getenv("MYSQLHOST"),
+        user=os.getenv("MYSQLUSER"),
+        password=os.getenv("MYSQLPASSWORD"),
+        db=os.getenv("MYSQLDATABASE"),
+        port=int(os.getenv("MYSQLPORT", 3306)),
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor,
         auth_plugin_map={
             'caching_sha2_password': 'mysql_native_password'
-        }  # ✅ 추가!
+        }
     )
+
 
 @app.route("/stats")
 def get_stats():
