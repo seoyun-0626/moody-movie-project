@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MoodyMovie - 메인</title>
 
-  <!-- ✅ CSS 절대 경로 -->
-  <link rel="stylesheet" href="/static/css/index.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
 </head>
 
 <body>
   <header class="mm-header">
     <div class="logo-wrap">
-      <!-- ✅ 로고 절대 경로 -->
-      <img src="/static/assets/img/chatbot-logo.png" alt="MoodyMovie" class="logo-icon"/>
+      <img src="{{ url_for('static', filename='assets/img/chatbot-logo.png') }}" alt="MoodyMovie" class="logo-icon"/>
       <h2 class="brand tracking-in-expand">MoodyMovie</h2>
     </div>
   </header>
@@ -24,9 +22,10 @@
     </div>
 
     <div class="chat-wrapper home-chat-inline">
-      <!-- ✅ 챗봇 버튼 절대 경로 -->
-      <a class="chatbtn icon" href="/chatbot">
-        <img id="emotion-icon" src="/static/assets/img/chatbot-logo.png" alt="챗봇 아이콘" />
+      <a class="chatbtn icon" href="{{ url_for('chatbot') }}">
+        <img id="emotion-icon" 
+             src="{{ url_for('static', filename='assets/img/chatbot-logo.png') }}" 
+             alt="챗봇 아이콘" />
       </a>
       <a>챗봇</a>
       <div class="chat-tooltip">감정에 맞는 영화를 추천해 드릴게요!</div>
@@ -43,7 +42,7 @@
             <ul id="search-history" class="hidden"></ul>
           </div>
           <button id="search-btn" class="search-btn" type="button">
-            <img src="/static/assets/img/search-icon.png" alt="검색" />
+            <img src="{{ url_for('static', filename='assets/img/search-icon.png') }}" alt="검색" />
           </button>
         </div>   
       </section>
@@ -83,12 +82,11 @@
             <ul id="search-history-results" class="hidden"></ul>
           </div>
           <button id="search-btn-results" class="search-btn" type="button">
-            <img src="/static/assets/img/search-icon.png" alt="검색" />
+            <img src="{{ url_for('static', filename='assets/img/search-icon.png') }}" alt="검색" />
           </button>
         </div>
       </section>
 
-      
       <div class="main-container">
         <h2 class="results-title">검색 결과</h2>
         <div class="grid-section">
@@ -98,8 +96,8 @@
       </div>
       
       <div class="chat-wrapper grid-chat">
-        <a id="grid-chatbtn" class="chatbtn-grid icon" href="/chatbot">
-          <img id="grid-emotion-icon" src="/static/assets/img/grid-chatbot.png" alt="챗봇 아이콘" />
+        <a id="grid-chatbtn" class="chatbtn-grid icon" href="{{ url_for('chatbot') }}">
+          <img id="grid-emotion-icon" src="{{ url_for('static', filename='assets/img/grid-chatbot.png') }}" alt="챗봇 아이콘" />
         </a>
         <div class="chat-tooltip">영화를 추천해 드릴까요?</div>
       </div>
@@ -108,7 +106,6 @@
     </section>
   </main>
 
-  <!-- ✅ JS 절대 경로 -->
-  <script src="/static/js/index.js" defer></script>
+  <script src="{{ url_for('static', filename='js/index.js') }}" defer></script>
 </body>
 </html>

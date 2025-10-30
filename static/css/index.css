@@ -201,11 +201,12 @@ body {
 
 #grid-chatbtn {
   background: none !important;
+  border-radius: 50%;
   position: fixed;
   bottom: 90px;
   right: 25px;
   width: 79px;   
-  height: 79px;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
